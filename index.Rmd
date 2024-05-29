@@ -5,30 +5,29 @@ output: html_document
 
 ### Introduction
 
-An introduction of the problem domain and a description of the variable(s) you are choosing to analyze (and why!)
+Introduction
+Incarceration rates in the United States have been a topic of significant concern and study for decades. Understanding the dynamics of incarceration rates, particularly how they vary by race, gender, and geographic location, is crucial for informing policies and interventions aimed at reducing mass incarceration and addressing racial disparities in the criminal justice system. This report analyzes various measures of incarceration using data on jail and prison population rates across different counties in Washington state from 1990 onwards. The primary variables of interest include total jail and prison population rates, disaggregated by race and gender.
 
-### Summary Information
+Summary Information
+This section summarizes key findings from the dataset. Below are five relevant summary statistics calculated from the data:
 
-Write a summary paragraph of findings that includes the 5 values calculated from your summary information R script
+Average Total Jail Population Rate: The average total jail population rate across all counties and years is 194.94 per 100,000 people.
+Maximum Total Jail Population Rate: The highest total jail population rate observed is 607.14 per 100,000 people.
+Minimum Total Jail Population Rate: The lowest total jail population rate observed is 0 per 100,000 people.
+Average Total Prison Population Rate: The average total prison population rate across all counties and years is 142.79 per 100,000 people.
+Maximum Total Prison Population Rate: The highest total prison population rate observed is 388.92 per 100,000 people.
+These statistics provide an overview of the incarceration rates in Washington state, highlighting the variation in jail and prison populations across different counties and over time.
 
-These will likely be calculated using your DPLYR skills, answering questions such as: 
+The Dataset
+The dataset used in this analysis was collected by the Vera Institute of Justice, a non-profit organization focused on justice reform. The data was compiled from various sources, including government reports and correctional institution records, to provide a comprehensive view of incarceration rates over time. The primary purpose of collecting this data is to support research and advocacy efforts aimed at understanding and reducing mass incarceration.
 
-- What is the average value of my variable across all the counties (in the current year)?
-- Where is my variable the highest / lowest?
-- How much has my variable change over the last N years?
+Number of Observations: The dataset contains 308 observations (rows), representing different counties and years.
+Number of Features: There are 23 features (columns) in the dataset, including variables such as county name, year, total population, jail and prison population rates disaggregated by race and gender, and urbanicity.
+Ethical Considerations:
+When working with incarceration data, it is important to consider the ethical implications, such as the potential for reinforcing racial stereotypes or biases. Additionally, the privacy and dignity of individuals represented in the data must be safeguarded. It is crucial to use the data responsibly, ensuring that analyses and conclusions drawn do not perpetuate injustice or discrimination.
 
-Feel free to calculate and report values that you find relevant. Again, remember that the purpose is to think about how these measure of incarceration vary by race.
-
-### The Dataset
-
-Who collected the data?  
-How was the data collected or generated?  
-Why was the data collected?  
-How many observations (rows) are in your data?  
-How many features (columns) are in the data?  
-What, if any, ethical questions or questions of power do you need to consider when working with this data?  
-What are possible limitations or problems with this data?   (at least 200 words)
-
+Limitations:
+One limitation of the dataset is the potential for missing or incomplete data, which can affect the accuracy of analyses. Additionally, the data may not capture all factors influencing incarceration rates, such as socio-economic conditions or changes in law enforcement practices. There may also be inconsistencies in how data was reported by different counties, which could impact the comparability of the results.
 
 ### Trends Over Time Chart
 
@@ -49,23 +48,114 @@ Here's an example of how to run an R script inside an RMarkdown file:
 ``````{r, echo = FALSE, code = readLines("chart1_example.R")}
 ```
 
+if (!requireNamespace("ggplot2", quietly = TRUE)) {
+  install.packages("ggplot2")
+}
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+  install.packages("dplyr")
+}
+if (!requireNamespace("tidyr", quietly = TRUE)) {
+  install.packages("tidyr")
+}
+
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+
+data <- read.csv("us-prison-jail-rates-1990-WA.csv")
+
+
+racial_groups <- c("aapi_jail_pop_rate", "black_jail_pop_rate", "latinx_jail_pop_rate", "native_jail_pop_rate", "white_jail_pop_rate")
+data_long <- data %>%
+  select(year, county_name, all_of(racial_groups)) %>%
+  pivot_longer(cols = racial_groups, names_to = "Race", values_to = "Jail_Population_Rate")
+
+
+ggplot(data_long, aes(x = year, y = Jail_Population_Rate, color = Race)) +
+  geom_line() +
+  labs(title = "Total Jail Population Rate by Year for Different Racial Groups in Washington State",
+       x = "Year", y = "Jail Population Rate (per 100,000 people)") +
+  theme_minimal() +
+  scale_color_brewer(palette = "Set1", name = "Racial Group")
+
 ### Variable Comparison Chart
 
-Include a chart. Make sure to describe why you included the chart, and what patterns emerged
+Variable Comparison Chart
+The second chart compares the total jail population rate with the total prison population rate across counties in Washington state. This comparison helps to explore the relationship between these two measures of incarceration.
 
-The second chart that you will create and include will show how two different (continuous) variables are related to one another. Again, think carefully about what such a comparison means and what you want to communicate to your user (you may have to find relevant trends in the dataset first!). Here are some requirements to help guide your design:
+Patterns Observed:
 
-- You must have clear x and y axis labels
-- The chart needs a clear title 
-- If you choose to add a color encoding (not required), you need a legend for your different color and a clear legend title
+Correlation: There appears to be a positive correlation between jail and prison population rates, indicating that counties with higher jail rates tend to have higher prison rates as well.
+Urbanicity: The chart also shows differences based on urbanicity, with urban and rural areas exhibiting distinct patterns in incarceration rates.
+
+if (!requireNamespace("ggplot2", quietly = TRUE)) {
+  install.packages("ggplot2")
+}
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+  install.packages("dplyr")
+}
+
+
+library(ggplot2)
+library(dplyr)
+
+data <- read.csv("us-prison-jail-rates-1990-WA.csv")
+
+
+latest_year_data <- data %>%
+  group_by(county_name) %>%
+  filter(year == max(year)) %>%
+  ungroup()
+
+
+ggplot(latest_year_data, aes(x = total_jail_pop_rate, y = total_prison_pop_rate, color = urbanicity)) +
+  geom_point() +
+  labs(title = "Total Jail Population Rate vs Total Prison Population Rate by Urbanicity",
+       x = "Total Jail Population Rate (per 100,000 people)", y = "Total Prison Population Rate (per 100,000 people)") +
+  theme_minimal() +
+  scale_color_brewer(palette = "Set1", name = "Urbanicity")
 
 ### Map
 
-Include a chart. Make sure to describe why you included the chart, and what patterns emerged
+Map
+The map included in this report shows the geographic distribution of total jail population rates across different counties in Washington state. This visualization is essential for understanding how incarceration rates vary by location and can highlight regions with particularly high or low rates of incarceration.
 
-The last chart that you will create and include will show how a variable is distributed geographically. Again, think carefully about what such a comparison means and what you want to communicate to your user (you may have to find relevant trends in the dataset first!). Here are some requirements to help guide your design:
+Patterns Observed:
 
-- Your map needs a title
-- Your color scale needs a legend with a clear label
-- Use a map based coordinate system to set the aspect ratio of your map
+Spatial Variation: The map reveals significant spatial variation in jail population rates, with some counties exhibiting much higher rates than others.
+Urban vs. Rural: Counties with higher jail population rates tend to be more rural, indicating potential differences in law enforcement practices or socio-economic factors.
+Concentration of High Rates: Certain regions show a concentration of high incarceration rates, which could be indicative of localized issues that warrant further investigation.
 
+
+if (!requireNamespace("usmap", quietly = TRUE)) {
+  install.packages("usmap")
+}
+if (!requireNamespace("ggplot2", quietly = TRUE)) {
+  install.packages("ggplot2")
+}
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+  install.packages("dplyr")
+}
+
+
+library(usmap)
+library(ggplot2)
+library(dplyr)
+
+
+data <- read.csv("us-prison-jail-rates-1990-WA.csv")
+
+
+latest_year_data <- data %>%
+  group_by(county_name) %>%
+  filter(year == max(year)) %>%
+  ungroup()
+
+
+plot_usmap(data = latest_year_data, regions = "counties", include = "WA", values = "total_jail_pop_rate", color = "white") +
+  scale_fill_continuous(name = "Total Jail Population Rate (per 100,000)", label = scales::comma) +
+  theme_minimal() +
+  labs(title = "Total Jail Population Rate by County in Washington State") +
+  theme(legend.position = "right")
