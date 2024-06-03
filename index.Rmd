@@ -45,9 +45,8 @@ When we say "clear" or "human readable" titles and labels, that means that you s
 
 Here's an example of how to run an R script inside an RMarkdown file:
 
-``````{r, echo = FALSE, code = readLines("chart1_example.R")}
-```
 
+```{r}
 if (!requireNamespace("ggplot2", quietly = TRUE)) {
   install.packages("ggplot2")
 }
@@ -79,6 +78,11 @@ ggplot(data_long, aes(x = year, y = Jail_Population_Rate, color = Race)) +
        x = "Year", y = "Jail Population Rate (per 100,000 people)") +
   theme_minimal() +
   scale_color_brewer(palette = "Set1", name = "Racial Group")
+ 
+```
+
+
+
 
 ### Variable Comparison Chart
 
@@ -89,7 +93,7 @@ Patterns Observed:
 
 Correlation: There appears to be a positive correlation between jail and prison population rates, indicating that counties with higher jail rates tend to have higher prison rates as well.
 Urbanicity: The chart also shows differences based on urbanicity, with urban and rural areas exhibiting distinct patterns in incarceration rates.
-
+```{r}
 if (!requireNamespace("ggplot2", quietly = TRUE)) {
   install.packages("ggplot2")
 }
@@ -109,13 +113,15 @@ latest_year_data <- data %>%
   filter(year == max(year)) %>%
   ungroup()
 
-
 ggplot(latest_year_data, aes(x = total_jail_pop_rate, y = total_prison_pop_rate, color = urbanicity)) +
   geom_point() +
   labs(title = "Total Jail Population Rate vs Total Prison Population Rate by Urbanicity",
        x = "Total Jail Population Rate (per 100,000 people)", y = "Total Prison Population Rate (per 100,000 people)") +
   theme_minimal() +
   scale_color_brewer(palette = "Set1", name = "Urbanicity")
+
+```
+
 
 ### Map
 
@@ -128,7 +134,7 @@ Spatial Variation: The map reveals significant spatial variation in jail populat
 Urban vs. Rural: Counties with higher jail population rates tend to be more rural, indicating potential differences in law enforcement practices or socio-economic factors.
 Concentration of High Rates: Certain regions show a concentration of high incarceration rates, which could be indicative of localized issues that warrant further investigation.
 
-
+```{r}
 if (!requireNamespace("usmap", quietly = TRUE)) {
   install.packages("usmap")
 }
@@ -159,3 +165,6 @@ plot_usmap(data = latest_year_data, regions = "counties", include = "WA", values
   theme_minimal() +
   labs(title = "Total Jail Population Rate by County in Washington State") +
   theme(legend.position = "right")
+
+```
+
